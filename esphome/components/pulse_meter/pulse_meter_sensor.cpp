@@ -87,7 +87,7 @@ void PulseMeterSensor::loop() {
 float PulseMeterSensor::get_setup_priority() const { return setup_priority::DATA; }
 
 void PulseMeterSensor::dump_config() {
-  LOG_SENSOR("", "Pulse Meter", this);
+  LOG_SENSOR("", "Pulse Meter modified", this);
   LOG_PIN("  Pin: ", this->pin_);
   if (this->filter_mode_ == FILTER_EDGE) {
     ESP_LOGCONFIG(TAG, "  Filtering rising edges less than %" PRIu32 " µs apart", this->filter_us_);
