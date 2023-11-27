@@ -64,7 +64,6 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   uint32_t last_edge_candidate_us_ = 0;
   uint32_t last_intr_ = 0;
   bool in_pulse_ = false;
-  bool last_pin_val_ = false;
   int32_t sum_us_ = 0;
 };
 
