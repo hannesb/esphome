@@ -65,7 +65,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   uint32_t last_intr_ = 0;
   bool in_pulse_ = false;
   bool last_pin_val_ = false;
-  int32_t level_ = 0;
+  int32_t sum_us_ = 0;
 };
 
 }  // namespace pulse_meter
