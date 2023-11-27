@@ -131,6 +131,8 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
       if (sensor->level_ >= sensor->filter_us_) {
         if (!sensor->in_pulse_) {
           sensor->in_pulse_ = true;
+          sensor->set_->last_detected_edge_us_ = now - (sensor->level_ - sensor->filter_us);
+          sensor->set_->count_++;
         }
         sensor->level_ = sensor->filter_us_;
       }
@@ -140,8 +142,6 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
       if (sensor->level_ < 0) {
         if (sensor->in_pulse_) {
           sensor->in_pulse_ = false;
-          sensor->set_->last_detected_edge_us_ = now + sensor->level_;
-          sensor->set_->count_++;
         }
         sensor->level_ = 0;
       }
