@@ -117,37 +117,47 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   const bool pin_val = sensor->isr_pin_.digital_read();
   const uint32_t delta_us = now - sensor->last_intr_;
 
-  if (!pin_val) {
-    // Falling edge
-    // Accumulate the time the signal was HIGH
-    sensor->sum_us_ += delta_us;
-    if (sensor->sum_us_ >= sensor->filter_us_) {
-      // Signal was longer HIGH than filter_us_
-      if (!sensor->in_pulse_) {
-        // Accept high signal once
-        sensor->in_pulse_ = true;
-        // calculate back the time when sum_us_ was equal to filter_us_
-        sensor->set_->last_detected_edge_us_ = now - (sensor->sum_us_ - sensor->filter_us_);
-        sensor->set_->count_++;
-      }
-      // Limit accumulation to [0..filter_us_]
-      sensor->sum_us_ = sensor->filter_us_;
+// A pulse occurred faster than we can detect
+  if (sensor->last_pin_val_ == pin_val) {
+    // If we haven't reached the filter length yet we need to reset our last_intr_ to now
+    // otherwise we can consider this noise as the "pulse" was certainly less than filter_us_
+    if (now - sensor->last_intr_ < sensor->filter_us_) {
+      sensor->last_intr_ = now;
     }
-  } else {
-    // Rising edge
-    // Accumulate the time the signal was LOW (starting with filter_us_)
-    sensor->sum_us_ -= delta_us;
-    if (sensor->sum_us_ < 0) {
-      // Signal was longer LOW than filter_us_
-      if (sensor->in_pulse_) {
-        // Accept low signal once
-        sensor->in_pulse_ = false;
+  } else {  
+    if (!pin_val) {
+      // Falling edge
+      // Accumulate the time the signal was HIGH
+      sensor->sum_us_ += delta_us;
+      if (sensor->sum_us_ >= sensor->filter_us_) {
+        // Signal was longer HIGH than filter_us_
+        if (!sensor->in_pulse_) {
+          // Accept high signal once
+          sensor->in_pulse_ = true;
+          // calculate back the time when sum_us_ was equal to filter_us_
+          sensor->set_->last_detected_edge_us_ = now - (sensor->sum_us_ - sensor->filter_us_);
+          sensor->set_->count_++;
+        }
+        // Limit accumulation to [0..filter_us_]
+        sensor->sum_us_ = sensor->filter_us_;
       }
-      // Limit accumulation to [0..filter_us_]
-      sensor->sum_us_ = 0;
+    } else {
+      // Rising edge
+      // Accumulate the time the signal was LOW (starting with filter_us_)
+      sensor->sum_us_ -= delta_us;
+      if (sensor->sum_us_ < 0) {
+        // Signal was longer LOW than filter_us_
+        if (sensor->in_pulse_) {
+          // Accept low signal once
+          sensor->in_pulse_ = false;
+        }
+        // Limit accumulation to [0..filter_us_]
+        sensor->sum_us_ = 0;
+      }
     }
+    sensor->last_intr_ = now;
+    sensor->last_pin_val_ = pin_val;
   }
-  sensor->last_intr_ = now;
 }
 
 }  // namespace pulse_meter
