@@ -115,6 +115,7 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
   const bool pin_val = sensor->isr_pin_.digital_read();
+  const uint32_t delta_us = now - sensor->last_intr_;
 
   // A pulse occurred faster than we can detect
   if (sensor->last_pin_val_ == pin_val) {
@@ -124,21 +125,27 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
       sensor->last_intr_ = now;
     }
   } else {
-    // Check if the last interrupt was long enough in the past
-    if (now - sensor->last_intr_ > sensor->filter_us_) {
-      // High pulse of filter length now falling (therefore last_intr_ was the rising edge)
-      if (!sensor->in_pulse_ && sensor->last_pin_val_) {
-        sensor->last_edge_candidate_us_ = sensor->last_intr_;
-        sensor->in_pulse_ = true;
+    if (!pin_val) {
+      // Falling edge
+      sensor->level_ += delta_us;
+      if (sensor->level_ >= sensor->filter_us_) {
+        if (!sensor->in_pulse_) {
+          sensor->in_pulse_ = true;
+          sensor->set_->last_detected_edge_us_ = now - sensor->level_;
+          sensor->set_->count_++;
+        }
+        sensor->level_ = sensor->filter_us_;
       }
-      // Low pulse of filter length now rising (therefore last_intr_ was the falling edge)
-      else if (sensor->in_pulse_ && !sensor->last_pin_val_) {
-        sensor->set_->last_detected_edge_us_ = sensor->last_edge_candidate_us_;
-        sensor->set_->count_++;
-        sensor->in_pulse_ = false;
+    } else {
+      // Rising edge
+      sensor->level_ -= delta_us;
+      if (sensor->level_ < 0) {
+        if (!sensor->in_pulse_) {
+          sensor->in_pulse_ = false;
+        }
+        sensor->level_ = 0;
       }
     }
-
     sensor->last_intr_ = now;
     sensor->last_pin_val_ = pin_val;
   }
