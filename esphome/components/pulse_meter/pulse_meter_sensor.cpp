@@ -140,7 +140,7 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
       // Rising edge
       sensor->level_ -= delta_us;
       if (sensor->level_ < 0) {
-        if (!sensor->in_pulse_) {
+        if (sensor->in_pulse_) {
           sensor->in_pulse_ = false;
         }
         sensor->level_ = 0;
