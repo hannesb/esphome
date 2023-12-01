@@ -99,7 +99,8 @@ async def to_code(config):
         cg.add(var.set_total_sensor(sens))
 
     if CONF_LED in config:
-        cg.add(var.set_led_pin(config[CONF_LED]))
+        led_pin = await cg.gpio_pin_expression(config[CONF_LED])
+        cg.add(var.set_pin(led_pin))
 
 @automation.register_action(
     "pulse_meter.set_total_pulses",
