@@ -2,6 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation, pins
 from esphome.components import sensor
+from esphome.components import output
 from esphome.const import (
     CONF_ID,
     CONF_INTERNAL_FILTER,
@@ -16,6 +17,7 @@ from esphome.const import (
     STATE_CLASS_TOTAL_INCREASING,
     UNIT_PULSES,
     UNIT_PULSES_PER_MINUTE,
+    CONF_LED,
 )
 from esphome.core import CORE
 
@@ -77,6 +79,7 @@ CONFIG_SCHEMA = sensor.sensor_schema(
         cv.Optional(CONF_INTERNAL_FILTER_MODE, default="EDGE"): cv.enum(
             FILTER_MODES, upper=True
         ),
+        cv.Optional(CONF_LED),
     }
 )
 
@@ -95,6 +98,8 @@ async def to_code(config):
         sens = await sensor.new_sensor(config[CONF_TOTAL])
         cg.add(var.set_total_sensor(sens))
 
+    if CONF_LED in config:
+        cg.add(var.set_led_pin(config[CONF_LED]))
 
 @automation.register_action(
     "pulse_meter.set_total_pulses",
