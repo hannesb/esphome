@@ -26,6 +26,9 @@ void PulseMeterSensor::setup() {
   } else if (this->filter_mode_ == FILTER_PULSE) {
     this->pin_->attach_interrupt(PulseMeterSensor::pulse_intr, this, gpio::INTERRUPT_ANY_EDGE);
   }
+  if (this->led_pin_ != nullptr) {
+    this->led_pin_->setup();    
+  }
 }
 
 void PulseMeterSensor::loop() {
@@ -81,6 +84,9 @@ void PulseMeterSensor::loop() {
       default:
         break;
     }
+  }
+  if (this->led_pin_ != nullptr) {
+    this->led_pin_.digital_write(this->isr_pin_.digital_read());
   }
 }
 
