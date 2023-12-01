@@ -86,7 +86,7 @@ void PulseMeterSensor::loop() {
     }
   }
   if (this->led_pin_ != nullptr) {
-    this->led_pin_.digital_write(this->isr_pin_.digital_read());
+    this->led_pin_->digital_write(this->isr_pin_.digital_read());
   }
 }
 
