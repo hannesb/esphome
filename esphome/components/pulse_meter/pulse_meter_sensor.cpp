@@ -85,9 +85,6 @@ void PulseMeterSensor::loop() {
         break;
     }
   }
-  if (this->led_pin_ != nullptr) {
-    this->led_pin_->digital_write(this->isr_pin_.digital_read());
-  }
 }
 
 float PulseMeterSensor::get_setup_priority() const { return setup_priority::DATA; }
@@ -121,6 +118,9 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
   const bool pin_val = sensor->isr_pin_.digital_read();
+  if (sensor->led_pin_ != nullptr) {
+    sensor->led_pin_->digital_write(pin_val);
+  }
 
   // A pulse occurred faster than we can detect
   if (sensor->last_pin_val_ == pin_val) {
