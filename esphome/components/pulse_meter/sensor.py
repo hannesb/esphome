@@ -79,7 +79,7 @@ CONFIG_SCHEMA = sensor.sensor_schema(
         cv.Optional(CONF_INTERNAL_FILTER_MODE, default="EDGE"): cv.enum(
             FILTER_MODES, upper=True
         ),
-        cv.Optional(CONF_LED),
+        cv.Optional(CONF_LED): validate_pulse_meter_pin,
     }
 )
 
