@@ -17,11 +17,12 @@ from esphome.const import (
     STATE_CLASS_TOTAL_INCREASING,
     UNIT_PULSES,
     UNIT_PULSES_PER_MINUTE,
-    CONF_LED,
 )
 from esphome.core import CORE
 
 CODEOWNERS = ["@stevebaxter", "@cstaahl", "@TrentHouliston"]
+
+CONF_LED_PIN = "led_pin"
 
 pulse_meter_ns = cg.esphome_ns.namespace("pulse_meter")
 
@@ -79,7 +80,7 @@ CONFIG_SCHEMA = sensor.sensor_schema(
         cv.Optional(CONF_INTERNAL_FILTER_MODE, default="EDGE"): cv.enum(
             FILTER_MODES, upper=True
         ),
-        cv.Optional(CONF_LED): pins.internal_gpio_input_pin_schema,
+        cv.Optional(CONF_LED_PIN): pins.gpio_output_pin_schema,
     }
 )
 
@@ -98,8 +99,8 @@ async def to_code(config):
         sens = await sensor.new_sensor(config[CONF_TOTAL])
         cg.add(var.set_total_sensor(sens))
 
-    if CONF_LED in config:
-        led_pin = await cg.gpio_pin_expression(config[CONF_LED])
+    if CONF_LED_PIN in config:
+        led_pin = await cg.gpio_pin_expression(config[CONF_LED_PIN])
         cg.add(var.set_pin(led_pin))
 
 @automation.register_action(
