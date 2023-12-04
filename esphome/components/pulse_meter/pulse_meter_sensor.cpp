@@ -99,6 +99,10 @@ void PulseMeterSensor::dump_config() {
   }
   ESP_LOGCONFIG(TAG, "  Assuming 0 pulses/min after not receiving a pulse for %" PRIu32 "s",
                 this->timeout_us_ / 1000000);
+  
+  if (sensor->led_pin_ != nullptr) {
+    LOG_PIN("  Led_Pin: ", this->led_pin_);
+  }
 }
 
 void IRAM_ATTR PulseMeterSensor::edge_intr(PulseMeterSensor *sensor) {
