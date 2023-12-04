@@ -143,7 +143,7 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
       }
       // Low pulse of filter length now rising (therefore last_intr_ was the falling edge)
       else if (sensor->in_pulse_ && !sensor->last_pin_val_) {
-        sensor->set_->last_detected_edge_us_ = sensor->last_edge_candidate_us_;
+        sensor->set_->last_detected_edge_us_ = sensor->now;
         sensor->set_->count_++;
         sensor->in_pulse_ = false;
       }
