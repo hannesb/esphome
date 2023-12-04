@@ -28,6 +28,7 @@ void PulseMeterSensor::setup() {
   }
   if (this->led_pin_ != nullptr) {
     this->led_pin_->setup();    
+    this->led_pin_->turn_on();    
   }
 }
 
