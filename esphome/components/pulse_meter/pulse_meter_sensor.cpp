@@ -116,7 +116,7 @@ void IRAM_ATTR PulseMeterSensor::edge_intr(PulseMeterSensor *sensor) {
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
   //const bool pin2_val = sensor->isr_pin2_.digital_read();
-  const bool pin2_val = sensor->pin2_.digital_read();
+  const bool pin2_val = sensor->pin2_->digital_read();
   sensor->in_pulse_ = pin2_val;
 
   if (pin2_val == sensor->forward_) {
