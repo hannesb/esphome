@@ -42,6 +42,8 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   //uint32_t filter_us_ = 0;
   uint32_t timeout_us_ = 1000000UL * 60UL * 5UL;
   sensor::Sensor *total_sensor_{nullptr};
+  sensor::Sensor *forward_sensor_{nullptr};
+  sensor::Sensor *reverse_sensor_{nullptr};
   //InternalFilterMode filter_mode_{FILTER_EDGE};
 
   // Variables used in the loop
@@ -67,12 +69,12 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   volatile State *get_ = state_ + 1;
 
   // Only use these variables in the ISR
-  ISRInternalGPIOPin isr_pin_;
+  ISRInternalGPIOPin isr_pin2_;
   //uint32_t last_edge_candidate_us_ = 0;
   //uint32_t last_intr_ = 0;
   bool in_pulse_ = false;
   bool last_pin_val_ = false;
-  bool reverse_ = false;
+  bool forward_ = true;
 };
 
 }  // namespace pulse_meter
