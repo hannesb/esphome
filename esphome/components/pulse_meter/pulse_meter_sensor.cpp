@@ -17,7 +17,7 @@ void PulseMeterSensor::set_total_pulses(uint32_t pulses) {
 void PulseMeterSensor::setup() {
   this->pin_->setup();
   this->pin2_->setup();
-  this->isr_pin2_ = pin2_->to_isr();
+  // this->isr_pin2_ = pin2_->to_isr();
 
   // Set the last processed edge to now for the first timeout
   this->last_processed_edge_us_ = micros();
@@ -27,7 +27,7 @@ void PulseMeterSensor::setup() {
 
 void PulseMeterSensor::loop() {
 
-  ESP_LOGD(TAG, "'%s': %d %d %d %d", this->get_name().c_str(), this->pin_->digital_read(), this->pin2_->digital_read(), this->in_pulse_, this->forward_);
+  // ESP_LOGD(TAG, "'%s': %d %d %d %d", this->get_name().c_str(), this->pin_->digital_read(), this->pin2_->digital_read(), this->in_pulse_, this->forward_);
       
   // Reset the count in get before we pass it back to the ISR as set
   this->get_->count_up_ = 0;
@@ -115,7 +115,8 @@ void IRAM_ATTR PulseMeterSensor::edge_intr(PulseMeterSensor *sensor) {
   // This is an interrupt handler - we can't call any virtual method from this method
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
-  const bool pin2_val = sensor->isr_pin2_.digital_read();
+  //const bool pin2_val = sensor->isr_pin2_.digital_read();
+  const bool pin2_val = sensor->pin2_.digital_read();
   sensor->in_pulse_ = pin2_val;
 
   if (pin2_val == sensor->forward_) {
