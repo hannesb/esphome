@@ -13,14 +13,13 @@ namespace pulse_meter {
 class PulseMeterSensor : public sensor::Sensor, public Component {
  public:
   void set_pin(InternalGPIOPin *pin) { this->pin_ = pin; }
-  // void set_pin2(InternalGPIOPin *pin) { this->pin2_ = pin; }
-  void set_pin2(GPIOPin *pin) { this->pin2_ = pin; }
+  void set_pin2(InternalGPIOPin *pin) { this->pin2_ = pin; }
   void set_timeout_us(uint32_t timeout) { this->timeout_us_ = timeout; }
   void set_total_sensor(sensor::Sensor *sensor) { this->total_sensor_ = sensor; }
   void set_forward_sensor(sensor::Sensor *sensor) { this->forward_sensor_ = sensor; }
   void set_reverse_sensor(sensor::Sensor *sensor) { this->reverse_sensor_ = sensor; }
 
-  void set_total_pulses(uint32_t pulses);
+  void set_total_pulses(int32_t pulses);
 
   void setup() override;
   void loop() override;
@@ -31,9 +30,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   static void edge_intr(PulseMeterSensor *sensor);
 
   InternalGPIOPin *pin_{nullptr};
-  // InternalGPIOPin *pin2_{nullptr};
-  GPIOPin *pin2_{nullptr};
-  //GPIOPin *led_pin_{nullptr};
+  InternalGPIOPin *pin2_{nullptr};
   uint32_t timeout_us_ = 1000000UL * 60UL * 5UL;
   sensor::Sensor *total_sensor_{nullptr};
   sensor::Sensor *forward_sensor_{nullptr};
@@ -42,7 +39,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   // Variables used in the loop
   enum class MeterState { INITIAL, RUNNING, TIMED_OUT };
   MeterState meter_state_ = MeterState::INITIAL;
-  uint32_t total_pulses_ = 0;
+  int32_t total_pulses_ = 0;
   uint32_t total_pulses_up_ = 0;
   uint32_t total_pulses_down_ = 0;
   uint32_t last_processed_edge_us_ = 0;
@@ -63,7 +60,6 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
 
   // Only use these variables in the ISR
   ISRInternalGPIOPin isr_pin2_;
-  bool in_pulse_ = false;
   bool forward_ = true;
 };
 
