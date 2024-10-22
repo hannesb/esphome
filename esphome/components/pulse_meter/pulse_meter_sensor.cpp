@@ -7,7 +7,7 @@ namespace pulse_meter {
 
 static const char *const TAG = "pulse_meter";
 
-void PulseMeterSensor::set_total_pulses(uint32_t pulses) {
+void PulseMeterSensor::set_total_pulses(int32_t pulses) {
   this->total_pulses_ = pulses;
   if (this->total_sensor_ != nullptr) {
     this->total_sensor_->publish_state(this->total_pulses_);
@@ -21,7 +21,7 @@ void PulseMeterSensor::setup() {
   
   this->pin_->setup();
   this->pin2_->setup();
-  // this->isr_pin2_ = pin2_->to_isr();
+  this->isr_pin2_ = pin2_->to_isr();
 
   // Set the last processed edge to now for the first timeout
   this->last_processed_edge_us_ = micros();
@@ -33,7 +33,7 @@ void PulseMeterSensor::loop() {
 
   if ((int32_t)(millis() - nextmillis) > 0) {
     nextmillis += 1000;
-    ESP_LOGD(TAG, "'%s': %d %d %d %d", this->get_name().c_str(), this->pin_->digital_read(), this->pin2_->digital_read(), this->in_pulse_, this->forward_);
+    // ESP_LOGD(TAG, "'%s': %d %d %d", this->get_name().c_str(), this->pin_->digital_read(), this->pin2_->digital_read(), this->forward_);
   }
       
   // Reset the count in get before we pass it back to the ISR as set
@@ -122,9 +122,7 @@ void IRAM_ATTR PulseMeterSensor::edge_intr(PulseMeterSensor *sensor) {
   // This is an interrupt handler - we can't call any virtual method from this method
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
-  //const bool pin2_val = sensor->isr_pin2_.digital_read();
-  const bool pin2_val = sensor->pin2_->digital_read();
-  sensor->in_pulse_ = pin2_val;
+  const bool pin2_val = sensor->isr_pin2_.digital_read();
 
   if (pin2_val == sensor->forward_) {
     if (pin2_val) {
