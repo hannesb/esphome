@@ -22,6 +22,8 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   //void set_filter_us(uint32_t filter) { this->filter_us_ = filter; }
   void set_timeout_us(uint32_t timeout) { this->timeout_us_ = timeout; }
   void set_total_sensor(sensor::Sensor *sensor) { this->total_sensor_ = sensor; }
+  void set_forward_sensor(sensor::Sensor *sensor) { this->forward_sensor_ = sensor; }
+  void set_reverse_sensor(sensor::Sensor *sensor) { this->reverse_sensor_ = sensor; }
   //void set_filter_mode(InternalFilterMode mode) { this->filter_mode_ = mode; }
   //void set_led_pin(GPIOPin *pin) { this->led_pin_ = pin; }
 
