@@ -13,7 +13,8 @@ namespace pulse_meter {
 class PulseMeterSensor : public sensor::Sensor, public Component {
  public:
   void set_pin(InternalGPIOPin *pin) { this->pin_ = pin; }
-  void set_pin2(InternalGPIOPin *pin) { this->pin2_ = pin; }
+  // void set_pin2(InternalGPIOPin *pin) { this->pin2_ = pin; }
+  void set_pin2(GPIOPin *pin) { this->pin2_ = pin; }
   void set_timeout_us(uint32_t timeout) { this->timeout_us_ = timeout; }
   void set_total_sensor(sensor::Sensor *sensor) { this->total_sensor_ = sensor; }
   void set_forward_sensor(sensor::Sensor *sensor) { this->forward_sensor_ = sensor; }
@@ -30,7 +31,8 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   static void edge_intr(PulseMeterSensor *sensor);
 
   InternalGPIOPin *pin_{nullptr};
-  InternalGPIOPin *pin2_{nullptr};
+  // InternalGPIOPin *pin2_{nullptr};
+  GPIOPin *pin2_{nullptr};
   //GPIOPin *led_pin_{nullptr};
   uint32_t timeout_us_ = 1000000UL * 60UL * 5UL;
   sensor::Sensor *total_sensor_{nullptr};
