@@ -26,6 +26,9 @@ void PulseMeterSensor::setup() {
 }
 
 void PulseMeterSensor::loop() {
+
+  ESP_LOGD(TAG, "'%s': %d %d %d %d", this->get_name().c_str(), this->pin_->digital_read(), this->pin2_->digital_read(), this->in_pulse_, this->forward_);
+      
   // Reset the count in get before we pass it back to the ISR as set
   this->get_->count_up_ = 0;
   this->get_->count_down_ = 0;
@@ -113,6 +116,7 @@ void IRAM_ATTR PulseMeterSensor::edge_intr(PulseMeterSensor *sensor) {
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
   const bool pin2_val = sensor->isr_pin2_.digital_read();
+  sensor->in_pulse_ = pin2_val;
 
   if (pin2_val == sensor->forward_) {
     if (pin2_val) {
