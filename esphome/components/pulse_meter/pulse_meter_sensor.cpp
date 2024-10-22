@@ -49,7 +49,7 @@ void PulseMeterSensor::loop() {
       if (this->reverse_sensor_ != nullptr) {
         if (this->get_->count_down_ > 0) {
           this->total_pulses_down_ += this->get_->count_down_;
-          this->reverse_sensor_->publish_statue(this->total_pulses_down_);
+          this->reverse_sensor_->publish_state(this->total_pulses_down_);
         }
       }
       if (this->total_sensor_ != nullptr) {
