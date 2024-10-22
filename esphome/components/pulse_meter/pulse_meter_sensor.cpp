@@ -40,23 +40,22 @@ void PulseMeterSensor::loop() {
   // Check if we detected a pulse this loop
   if (this->get_->count_up_ > 0 || this->get_->count_down_ > 0) {
     // Keep a running total of pulses if a total sensor is configured
-      if (this->forward_sensor_ != nullptr) {
-        if (this->get_->count_up_ > 0) {
-          this->total_pulses_up_ += this->get_->count_up_;
-          this->forward_sensor_->publish_state(this->total_pulses_up_);
-        }
+    if (this->forward_sensor_ != nullptr) {
+      if (this->get_->count_up_ > 0) {
+        this->total_pulses_up_ += this->get_->count_up_;
+        this->forward_sensor_->publish_state(this->total_pulses_up_);
       }
-      if (this->reverse_sensor_ != nullptr) {
-        if (this->get_->count_down_ > 0) {
-          this->total_pulses_down_ += this->get_->count_down_;
-          this->reverse_sensor_->publish_state(this->total_pulses_down_);
-        }
+    }
+    if (this->reverse_sensor_ != nullptr) {
+      if (this->get_->count_down_ > 0) {
+        this->total_pulses_down_ += this->get_->count_down_;
+        this->reverse_sensor_->publish_state(this->total_pulses_down_);
       }
-      if (this->total_sensor_ != nullptr) {
-        if (count != 0) {
-          this->total_pulses_ += count;
-          this->total_sensor_->publish_state(this->total_pulses_);
-        }
+    }
+    if (this->total_sensor_ != nullptr) {
+      if (count != 0) {
+        this->total_pulses_ += count;
+        this->total_sensor_->publish_state(this->total_pulses_);
       }
     }
 
@@ -77,9 +76,8 @@ void PulseMeterSensor::loop() {
       } break;
     }
     this->last_processed_edge_us_ = this->get_->last_detected_edge_us_;
-  }
-  // No detected edges this loop
-  else {
+  } else {
+    // No detected edges this loop
     const uint32_t now = micros();
     const uint32_t time_since_valid_edge_us = now - this->last_processed_edge_us_;
 
