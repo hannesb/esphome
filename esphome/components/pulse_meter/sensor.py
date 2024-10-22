@@ -14,6 +14,7 @@ from esphome.const import (
     CONF_VALUE,
     ICON_PULSE,
     STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL,
     STATE_CLASS_TOTAL_INCREASING,
     UNIT_PULSES,
     UNIT_PULSES_PER_MINUTE,
@@ -22,34 +23,23 @@ from esphome.core import CORE
 
 CODEOWNERS = ["@stevebaxter", "@cstaahl", "@TrentHouliston"]
 
-CONF_LED_PIN = "led_pin"
+CONF_PIN2 = "pin2"
+CONF_FORWARD = "forward"
+CONF_REVERSE = "reverse"
 
 pulse_meter_ns = cg.esphome_ns.namespace("pulse_meter")
-
 
 PulseMeterSensor = pulse_meter_ns.class_(
     "PulseMeterSensor", sensor.Sensor, cg.Component
 )
 
-PulseMeterInternalFilterMode = PulseMeterSensor.enum("InternalFilterMode")
-FILTER_MODES = {
-    "EDGE": PulseMeterInternalFilterMode.FILTER_EDGE,
-    "PULSE": PulseMeterInternalFilterMode.FILTER_PULSE,
-}
-
 SetTotalPulsesAction = pulse_meter_ns.class_("SetTotalPulsesAction", automation.Action)
-
-
-def validate_internal_filter(value):
-    return cv.positive_time_period_microseconds(value)
-
 
 def validate_timeout(value):
     value = cv.positive_time_period_microseconds(value)
     if value.total_minutes > 70:
         raise cv.Invalid("Maximum timeout is 70 minutes")
     return value
-
 
 def validate_pulse_meter_pin(value):
     value = pins.internal_gpio_input_pin_schema(value)
@@ -58,7 +48,6 @@ def validate_pulse_meter_pin(value):
             "Pins GPIO16 and GPIO17 cannot be used as pulse counters on ESP8266."
         )
     return value
-
 
 CONFIG_SCHEMA = sensor.sensor_schema(
     PulseMeterSensor,
@@ -69,21 +58,28 @@ CONFIG_SCHEMA = sensor.sensor_schema(
 ).extend(
     {
         cv.Required(CONF_PIN): validate_pulse_meter_pin,
-        cv.Optional(CONF_INTERNAL_FILTER, default="13us"): validate_internal_filter,
+        cv.Required(CONF_PIN2): validate_pulse_meter_pin,
         cv.Optional(CONF_TIMEOUT, default="5min"): validate_timeout,
         cv.Optional(CONF_TOTAL): sensor.sensor_schema(
             unit_of_measurement=UNIT_PULSES,
             icon=ICON_PULSE,
             accuracy_decimals=0,
+            state_class=STATE_CLASS_TOTAL,
+        ),
+        cv.Optional(CONF_FORWARD): sensor.sensor_schema(
+            unit_of_measurement=UNIT_PULSES,
+            icon=ICON_PULSE,
+            accuracy_decimals=0,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
-        cv.Optional(CONF_INTERNAL_FILTER_MODE, default="EDGE"): cv.enum(
-            FILTER_MODES, upper=True
+        cv.Optional(CONF_REVERSE): sensor.sensor_schema(
+            unit_of_measurement=UNIT_PULSES,
+            icon=ICON_PULSE,
+            accuracy_decimals=0,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
-        cv.Optional(CONF_LED_PIN): pins.gpio_output_pin_schema,
     }
 )
-
 
 async def to_code(config):
     var = await sensor.new_sensor(config)
@@ -91,17 +87,21 @@ async def to_code(config):
 
     pin = await cg.gpio_pin_expression(config[CONF_PIN])
     cg.add(var.set_pin(pin))
-    cg.add(var.set_filter_us(config[CONF_INTERNAL_FILTER]))
+    pin2 = await cg.gpio_pin_expression(config[CONF_PIN2])
+    cg.add(var.set_pin2(pin))
     cg.add(var.set_timeout_us(config[CONF_TIMEOUT]))
-    cg.add(var.set_filter_mode(config[CONF_INTERNAL_FILTER_MODE]))
 
     if CONF_TOTAL in config:
         sens = await sensor.new_sensor(config[CONF_TOTAL])
         cg.add(var.set_total_sensor(sens))
 
-    if CONF_LED_PIN in config:
-        led_pin = await cg.gpio_pin_expression(config[CONF_LED_PIN])
-        cg.add(var.set_led_pin(led_pin))
+    if CONF_FORWARD in config:
+        sens_forward = await sensor.new_sensor(config[CONF_FORWARD])
+        cg.add(var.set_forward_sensor(sens_forward))
+
+    if CONF_REVERSE in config:
+        sens_reverse = await sensor.new_sensor(config[CONF_REVERSE])
+        cg.add(var.set_reverse_sensor(sens_reverse))
 
 @automation.register_action(
     "pulse_meter.set_total_pulses",
