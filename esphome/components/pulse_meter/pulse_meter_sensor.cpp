@@ -14,7 +14,7 @@ void PulseMeterSensor::set_total_pulses(uint32_t pulses) {
   }
 }
 
-unit32_t nextmillis;
+uint32_t nextmillis;
 
 void PulseMeterSensor::setup() {
   nextmillis = millis() + 1000;
