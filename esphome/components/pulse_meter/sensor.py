@@ -88,7 +88,7 @@ async def to_code(config):
     pin = await cg.gpio_pin_expression(config[CONF_PIN])
     cg.add(var.set_pin(pin))
     pin2 = await cg.gpio_pin_expression(config[CONF_PIN2])
-    cg.add(var.set_pin2(pin))
+    cg.add(var.set_pin2(pin2))
     cg.add(var.set_timeout_us(config[CONF_TIMEOUT]))
 
     if CONF_TOTAL in config:
