@@ -133,7 +133,7 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   const uint32_t now = micros();
   const bool pin_val = sensor->isr_pin_.digital_read();
   const bool pin2_val = sensor->isr_pin2_.digital_read();
-  if (sensor->isr_led_pin_ != nullptr) {
+  if (sensor->led_pin_ != nullptr) {
     sensor->isr_led_pin_.digital_write(pin_val);
   }
   if (pin2_val) {
