@@ -27,7 +27,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   void dump_config() override;
 
  protected:
-  static void edge_intr(PulseMeterSensor *sensor);
+  static void pulse_intr(PulseMeterSensor *sensor);
 
   InternalGPIOPin *pin_{nullptr};
   InternalGPIOPin *pin2_{nullptr};
@@ -59,6 +59,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   volatile State *get_ = state_ + 1;
 
   // Only use these variables in the ISR
+  ISRInternalGPIOPin isr_pin_;
   ISRInternalGPIOPin isr_pin2_;
   bool forward_ = true;
 };
