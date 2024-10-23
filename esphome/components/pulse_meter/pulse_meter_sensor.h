@@ -18,6 +18,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   void set_total_sensor(sensor::Sensor *sensor) { this->total_sensor_ = sensor; }
   void set_forward_sensor(sensor::Sensor *sensor) { this->forward_sensor_ = sensor; }
   void set_reverse_sensor(sensor::Sensor *sensor) { this->reverse_sensor_ = sensor; }
+  void set_led_pin(InternalGPIOPin *pin) { this->led_pin_ = pin; }
 
   void set_total_pulses(int32_t pulses);
 
@@ -31,6 +32,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
 
   InternalGPIOPin *pin_{nullptr};
   InternalGPIOPin *pin2_{nullptr};
+  InternalGPIOPin *led_pin_{nullptr};
   uint32_t timeout_us_ = 1000000UL * 60UL * 5UL;
   sensor::Sensor *total_sensor_{nullptr};
   sensor::Sensor *forward_sensor_{nullptr};
@@ -61,6 +63,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   // Only use these variables in the ISR
   ISRInternalGPIOPin isr_pin_;
   ISRInternalGPIOPin isr_pin2_;
+  ISRInternalGPIOPin isr_led_pin_;
   bool forward_ = true;
 };
 
