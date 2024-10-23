@@ -21,12 +21,13 @@ void PulseMeterSensor::setup() {
   
   this->pin_->setup();
   this->pin2_->setup();
+  this->isr_pin_ = pin_->to_isr();
   this->isr_pin2_ = pin2_->to_isr();
 
   // Set the last processed edge to now for the first timeout
   this->last_processed_edge_us_ = micros();
 
-  this->pin_->attach_interrupt(PulseMeterSensor::edge_intr, this, gpio::INTERRUPT_RISING_EDGE);
+  this->pin_->attach_interrupt(PulseMeterSensor::pulse_intr, this, gpio::INTERRUPT_ANY_EDGE);
 }
 
 void PulseMeterSensor::loop() {
@@ -118,22 +119,30 @@ void PulseMeterSensor::dump_config() {
                 this->timeout_us_ / 1000000);  
 }
 
-void IRAM_ATTR PulseMeterSensor::edge_intr(PulseMeterSensor *sensor) {
+void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   // This is an interrupt handler - we can't call any virtual method from this method
   // Get the current time before we do anything else so the measurements are consistent
   const uint32_t now = micros();
+  const bool pin_val = sensor->isr_pin_.digital_read();
   const bool pin2_val = sensor->isr_pin2_.digital_read();
 
-  if (pin2_val == sensor->forward_) {
-    if (pin2_val) {
-      sensor->set_->count_up_++;
+  if (pin2_val) {
+    // Only edges when pin2 is high
+    if (pin_val == sensor->forward_) {
+      // same direction as before
+      if (pin_val) {
+        // rising edge
+        sensor->set_->count_up_++;
+      } else {
+        // falling edge
+        sensor->set_->count_down_++;
+      }
     } else {
-      sensor->set_->count_down_++;
+      // direction has changed
+      sensor->forward_ = pin_val;
     }
-  } else {
-    sensor->forward_ = pin2_val;
+  sensor->set_->last_detected_edge_us_ = now;    
   }
-  sensor->set_->last_detected_edge_us_ = now;
 }
 
 }  // namespace pulse_meter
