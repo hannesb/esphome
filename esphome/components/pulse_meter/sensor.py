@@ -23,6 +23,7 @@ from esphome.core import CORE
 
 CODEOWNERS = ["@stevebaxter", "@cstaahl", "@TrentHouliston"]
 
+CONF_LED_PIN = "led_pin"
 CONF_PIN2 = "pin2"
 CONF_FORWARD = "forward"
 CONF_REVERSE = "reverse"
@@ -78,6 +79,7 @@ CONFIG_SCHEMA = sensor.sensor_schema(
             accuracy_decimals=0,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
+        cv.Optional(CONF_LED_PIN): pins.gpio_output_pin_schema,
     }
 )
 
@@ -102,6 +104,10 @@ async def to_code(config):
     if CONF_REVERSE in config:
         sens_reverse = await sensor.new_sensor(config[CONF_REVERSE])
         cg.add(var.set_reverse_sensor(sens_reverse))
+
+    if CONF_LED_PIN in config:
+        led_pin = await cg.gpio_pin_expression(config[CONF_LED_PIN])
+        cg.add(var.set_led_pin(led_pin))
 
 @automation.register_action(
     "pulse_meter.set_total_pulses",
