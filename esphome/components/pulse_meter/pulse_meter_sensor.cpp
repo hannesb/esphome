@@ -21,13 +21,18 @@ void PulseMeterSensor::setup() {
   
   this->pin_->setup();
   this->pin2_->setup();
-  this->isr_pin_ = pin_->to_isr();
-  this->isr_pin2_ = pin2_->to_isr();
+  this->isr_pin_ = this->pin_->to_isr();
+  this->isr_pin2_ = this->pin2_->to_isr();
 
   // Set the last processed edge to now for the first timeout
   this->last_processed_edge_us_ = micros();
 
   this->pin_->attach_interrupt(PulseMeterSensor::pulse_intr, this, gpio::INTERRUPT_ANY_EDGE);
+  
+  if (this->led_pin_ != nullptr) {
+    this->led_pin_->setup();    
+    this->isr_led_pin_ = this->led_pin_->to_isr();
+  }
 }
 
 void PulseMeterSensor::loop() {
@@ -117,6 +122,9 @@ void PulseMeterSensor::dump_config() {
   LOG_PIN("  Pin2: ", this->pin2_);
   ESP_LOGCONFIG(TAG, "  Assuming 0 pulses/min after not receiving a pulse for %" PRIu32 "s",
                 this->timeout_us_ / 1000000);  
+  if (this->led_pin_ != nullptr) {
+    LOG_PIN("  Led_Pin: ", this->led_pin_);
+  }
 }
 
 void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
@@ -125,7 +133,9 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   const uint32_t now = micros();
   const bool pin_val = sensor->isr_pin_.digital_read();
   const bool pin2_val = sensor->isr_pin2_.digital_read();
-
+  if (sensor->isr_led_pin_ != nullptr) {
+    sensor->isr_led_pin_.digital_write(pin_val);
+  }
   if (pin2_val) {
     // Only edges when pin2 is high
     if (pin_val == sensor->forward_) {
