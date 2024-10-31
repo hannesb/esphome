@@ -8,18 +8,21 @@ namespace pulse_meter {
 static const char *const TAG = "pulse_meter";
 
 void PulseMeterSensor::set_total_pulses(int32_t pulses) {
+  ESP_LOGD(TAG, "'%s': set_total_pulses %d", this->get_name().c_str(), pulses);
   this->total_pulses_ = pulses;
   if (this->total_sensor_ != nullptr) {
     this->total_sensor_->publish_state(this->total_pulses_);
   }
 }
 void PulseMeterSensor::set_total_pulses_up(uint32_t pulses) {
+  ESP_LOGD(TAG, "'%s': set_total_pulses_up %d", this->get_name().c_str(), pulses);
   this->total_pulses_up_ = pulses;
   if (this->forward_sensor_ != nullptr) {
     this->forward_sensor_->publish_state(this->total_pulses_up_);
   }
 }
 void PulseMeterSensor::set_total_pulses_down(uint32_t pulses) {
+  ESP_LOGD(TAG, "'%s': set_total_pulses_down %d", this->get_name().c_str(), pulses);
   this->total_pulses_down_ = pulses;
   if (this->reverse_sensor_ != nullptr) {
     this->reverse_sensor_->publish_state(this->total_pulses_down_);
