@@ -13,6 +13,18 @@ void PulseMeterSensor::set_total_pulses(int32_t pulses) {
     this->total_sensor_->publish_state(this->total_pulses_);
   }
 }
+void PulseMeterSensor::set_total_pulses_up(uint32_t pulses) {
+  this->total_pulses_up_ = pulses;
+  if (this->forward_sensor_ != nullptr) {
+    this->forward_sensor_->publish_state(this->total_pulses_up_);
+  }
+}
+void PulseMeterSensor::set_total_pulses_down(uint32_t pulses) {
+  this->total_pulses_down_ = pulses;
+  if (this->reverse_sensor_ != nullptr) {
+    this->reverse_sensor_->publish_state(this->total_pulses_down_);
+  }
+}
 
 uint32_t nextmillis;
 
@@ -70,14 +82,14 @@ void PulseMeterSensor::loop() {
       publishState = true;
     }
     if (publishState) {
+      if (this->total_sensor_ != nullptr) {
+        this->total_sensor_->publish_state(this->total_pulses_);
+      }
       if (this->forward_sensor_ != nullptr) {
         this->forward_sensor_->publish_state(this->total_pulses_up_);
       }
       if (this->reverse_sensor_ != nullptr) {
         this->reverse_sensor_->publish_state(this->total_pulses_down_);
-      }
-      if (this->total_sensor_ != nullptr) {
-        this->total_sensor_->publish_state(this->total_pulses_);
       }
     }    
 
