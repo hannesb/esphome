@@ -21,6 +21,8 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   void set_led_pin(InternalGPIOPin *pin) { this->led_pin_ = pin; }
 
   void set_total_pulses(int32_t pulses);
+  void set_total_pulses_up(uint32_t pulses);
+  void set_total_pulses_down(uint32_t pulses);
 
   void setup() override;
   void loop() override;
