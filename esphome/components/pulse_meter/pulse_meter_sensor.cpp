@@ -70,31 +70,18 @@ void PulseMeterSensor::loop() {
 
   // Check if we detected a pulse this loop
   if (this->get_->count_up_ > 0 || this->get_->count_down_ > 0) {
-    bool publishState = false;
-    // Keep a running total of pulses if a total sensor is configured
-    if (this->get_->count_up_ > 0) {
-      this->total_pulses_up_ += this->get_->count_up_;
-      publishState = true;
+    this->total_pulses_up_ += this->get_->count_up_;
+    this->total_pulses_down_ += this->get_->count_down_;
+    this->total_pulses_ += count;
+    if (this->total_sensor_ != nullptr) {
+      this->total_sensor_->publish_state(this->total_pulses_);
     }
-    if (this->get_->count_down_ > 0) {
-      this->total_pulses_down_ += this->get_->count_down_;
-      publishState = true;
+    if (this->forward_sensor_ != nullptr) {
+      this->forward_sensor_->publish_state(this->total_pulses_up_);
     }
-    if (count != 0) {
-      this->total_pulses_ += count;
-      publishState = true;
+    if (this->reverse_sensor_ != nullptr) {
+      this->reverse_sensor_->publish_state(this->total_pulses_down_);
     }
-    if (publishState) {
-      if (this->total_sensor_ != nullptr) {
-        this->total_sensor_->publish_state(this->total_pulses_);
-      }
-      if (this->forward_sensor_ != nullptr) {
-        this->forward_sensor_->publish_state(this->total_pulses_up_);
-      }
-      if (this->reverse_sensor_ != nullptr) {
-        this->reverse_sensor_->publish_state(this->total_pulses_down_);
-      }
-    }    
 
     // We need to detect at least two edges to have a valid pulse width
     switch (this->meter_state_) {
