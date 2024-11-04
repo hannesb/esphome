@@ -84,9 +84,6 @@ void PulseMeterSensor::loop() {
     if (this->reverse_sensor_ != nullptr) {
       this->reverse_sensor_->publish_state(this->total_pulses_down_);
     }
-    if (this->debug_sensor_ != nullptr) {
-      this->debug_sensor_->publish_state(this->dbgCnt_);
-    }
 
     // We need to detect at least two edges to have a valid pulse width
     switch (this->meter_state_) {
@@ -125,6 +122,9 @@ void PulseMeterSensor::loop() {
         break;
     }
   }
+  if (this->debug_sensor_ != nullptr) {
+    this->debug_sensor_->publish_state(this->dbgCnt_);
+  }  
 }
 
 float PulseMeterSensor::get_setup_priority() const { return setup_priority::DATA; }
