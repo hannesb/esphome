@@ -55,7 +55,7 @@ void PulseMeterSensor::loop() {
 
   if ((int32_t)(millis() - nextmillis) > 0) {
     nextmillis += 1000;
-    ESP_LOGD(TAG, "'%s': %d %d %d %ld", this->get_name().c_str(), this->isr_pin_.digital_read(), this->isr_pin2_.digital_read(), this->forward_, this->dbgCnt_);
+    // ESP_LOGD(TAG, "'%s': %d %d %d %ld", this->get_name().c_str(), this->isr_pin_.digital_read(), this->isr_pin2_.digital_read(), this->forward_, this->dbgCnt_);
   }
       
   // Reset the count in get before we pass it back to the ISR as set
@@ -71,7 +71,7 @@ void PulseMeterSensor::loop() {
 
   // Check if we detected a pulse this loop
   if (this->get_->count_up_ > 0 || this->get_->count_down_ > 0) {
-    ESP_LOGD(TAG, "'%s': count_up_ %lu count_down_ %lu", this->get_name().c_str(), this->get_->count_up_, this->get_->count_down_);
+    // ESP_LOGD(TAG, "'%s': count_up_ %lu count_down_ %lu", this->get_name().c_str(), this->get_->count_up_, this->get_->count_down_);
     this->total_pulses_up_ += this->get_->count_up_;
     this->total_pulses_down_ += this->get_->count_down_;
     this->total_pulses_ += count;
@@ -83,6 +83,9 @@ void PulseMeterSensor::loop() {
     }
     if (this->reverse_sensor_ != nullptr) {
       this->reverse_sensor_->publish_state(this->total_pulses_down_);
+    }
+    if (this->debug_sensor_ != nullptr) {
+      this->debug_sensor_->publish_state(this->dbgCnt_);
     }
 
     // We need to detect at least two edges to have a valid pulse width
