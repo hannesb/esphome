@@ -48,13 +48,14 @@ void PulseMeterSensor::setup() {
     this->led_pin_->setup();    
     this->isr_led_pin_ = this->led_pin_->to_isr();
   }
+  this->dbgCnt_ = 0;
 }
 
 void PulseMeterSensor::loop() {
 
   if ((int32_t)(millis() - nextmillis) > 0) {
     nextmillis += 1000;
-    ESP_LOGD(TAG, "'%s': %d %d %d", this->get_name().c_str(), this->isr_pin_.digital_read(), this->isr_pin2_.digital_read(), this->forward_);
+    ESP_LOGD(TAG, "'%s': %d %d %d %ld", this->get_name().c_str(), this->isr_pin_.digital_read(), this->isr_pin2_.digital_read(), this->forward_, this->dbgCnt_);
   }
       
   // Reset the count in get before we pass it back to the ISR as set
@@ -139,6 +140,7 @@ void PulseMeterSensor::dump_config() {
 void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
   // This is an interrupt handler - we can't call any virtual method from this method
   // Get the current time before we do anything else so the measurements are consistent
+  sensor->dbgCnt_ += 1;
   const uint32_t now = micros();
   const bool pin_val = sensor->isr_pin_.digital_read();
   const bool pin2_val = sensor->isr_pin2_.digital_read();
@@ -151,10 +153,10 @@ void IRAM_ATTR PulseMeterSensor::pulse_intr(PulseMeterSensor *sensor) {
       // same direction as before
       if (pin_val) {
         // rising edge
-        sensor->set_->count_up_++;
+        sensor->set_->count_up_ += 1;
       } else {
         // falling edge
-        sensor->set_->count_down_++;
+        sensor->set_->count_down_ += 1;
       }
     } else {
       // direction has changed
