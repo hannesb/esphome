@@ -18,6 +18,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   void set_total_sensor(sensor::Sensor *sensor) { this->total_sensor_ = sensor; }
   void set_forward_sensor(sensor::Sensor *sensor) { this->forward_sensor_ = sensor; }
   void set_reverse_sensor(sensor::Sensor *sensor) { this->reverse_sensor_ = sensor; }
+  void set_debug_sensor(sensor::Sensor *sensor) { this->debug_sensor_ = sensor; }
   void set_led_pin(InternalGPIOPin *pin) { this->led_pin_ = pin; }
 
   void set_total_pulses(int32_t pulses);
@@ -39,6 +40,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   sensor::Sensor *total_sensor_{nullptr};
   sensor::Sensor *forward_sensor_{nullptr};
   sensor::Sensor *reverse_sensor_{nullptr};
+  sensor::Sensor *debug_sensor_{nullptr};
 
   // Variables used in the loop
   enum class MeterState { INITIAL, RUNNING, TIMED_OUT };
@@ -47,6 +49,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   uint32_t total_pulses_up_ = 0;
   uint32_t total_pulses_down_ = 0;
   uint32_t last_processed_edge_us_ = 0;
+  uint32_t dbgCnt_ = 0;
 
   // This struct (and the two pointers) are used to pass data between the ISR and loop.
   // These two pointers are exchanged each loop.
@@ -67,7 +70,6 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   ISRInternalGPIOPin isr_pin2_;
   ISRInternalGPIOPin isr_led_pin_;
   bool forward_ = true;
-  uint32_t dbgCnt_;
 };
 
 }  // namespace pulse_meter
