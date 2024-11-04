@@ -122,9 +122,12 @@ void PulseMeterSensor::loop() {
         break;
     }
   }
-  if (this->debug_sensor_ != nullptr) {
-    this->debug_sensor_->publish_state(this->dbgCnt_);
-  }  
+  if (this->dbgOldCnt_ != this->dbgCnt_) {
+    this->dbgOldCnt_ = this->dbgCnt_;
+    if (this->debug_sensor_ != nullptr) {
+      this->debug_sensor_->publish_state(this->dbgCnt_);
+    }  
+  }
 }
 
 float PulseMeterSensor::get_setup_priority() const { return setup_priority::DATA; }
