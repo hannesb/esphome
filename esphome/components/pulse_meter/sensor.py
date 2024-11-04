@@ -27,6 +27,7 @@ CONF_LED_PIN = "led_pin"
 CONF_PIN2 = "pin2"
 CONF_FORWARD = "forward"
 CONF_REVERSE = "reverse"
+CONF_DEBUG = "debug"
 
 pulse_meter_ns = cg.esphome_ns.namespace("pulse_meter")
 
@@ -79,6 +80,12 @@ CONFIG_SCHEMA = sensor.sensor_schema(
             accuracy_decimals=0,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
+        cv.Optional(CONF_DEBUG): sensor.sensor_schema(
+            unit_of_measurement=UNIT_PULSES,
+            icon=ICON_PULSE,
+            accuracy_decimals=0,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ),
         cv.Optional(CONF_LED_PIN): pins.gpio_output_pin_schema,
     }
 )
@@ -104,6 +111,10 @@ async def to_code(config):
     if CONF_REVERSE in config:
         sens_reverse = await sensor.new_sensor(config[CONF_REVERSE])
         cg.add(var.set_reverse_sensor(sens_reverse))
+
+    if CONF_DEBUG in config:
+        sens_debug = await sensor.new_sensor(config[CONF_DEBUG])
+        cg.add(var.set_debug_sensor(sens_debug))
 
     if CONF_LED_PIN in config:
         led_pin = await cg.gpio_pin_expression(config[CONF_LED_PIN])
