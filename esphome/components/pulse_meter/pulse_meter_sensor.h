@@ -50,6 +50,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   uint32_t total_pulses_down_ = 0;
   uint32_t last_processed_edge_us_ = 0;
   uint32_t dbgCnt_ = 0;
+  uint32_t dbgOldCnt_ = 0;
 
   // This struct (and the two pointers) are used to pass data between the ISR and loop.
   // These two pointers are exchanged each loop.
