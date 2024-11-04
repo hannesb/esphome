@@ -67,6 +67,7 @@ class PulseMeterSensor : public sensor::Sensor, public Component {
   ISRInternalGPIOPin isr_pin2_;
   ISRInternalGPIOPin isr_led_pin_;
   bool forward_ = true;
+  uint32_t dbgCnt_;
 };
 
 }  // namespace pulse_meter
