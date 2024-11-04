@@ -54,7 +54,7 @@ void PulseMeterSensor::loop() {
 
   if ((int32_t)(millis() - nextmillis) > 0) {
     nextmillis += 1000;
-    // ESP_LOGD(TAG, "'%s': %d %d %d", this->get_name().c_str(), this->pin_->digital_read(), this->pin2_->digital_read(), this->forward_);
+    ESP_LOGD(TAG, "'%s': %d %d", this->get_name().c_str(), this->isr_pin_.digital_read(), this->isr_pin2_.digital_read());
   }
       
   // Reset the count in get before we pass it back to the ISR as set
@@ -70,6 +70,7 @@ void PulseMeterSensor::loop() {
 
   // Check if we detected a pulse this loop
   if (this->get_->count_up_ > 0 || this->get_->count_down_ > 0) {
+    ESP_LOGD(TAG, "'%s': count_up_ %lu count_down_ %lu", this->get_name().c_str(), this->get_->count_up_, this->get_->count_down_);
     this->total_pulses_up_ += this->get_->count_up_;
     this->total_pulses_down_ += this->get_->count_down_;
     this->total_pulses_ += count;
